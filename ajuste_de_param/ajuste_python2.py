@@ -3,21 +3,26 @@ import pandas as pd
 from scipy.integrate import  solve_ivp
 from scipy.optimize import differential_evolution
 import math
+import matplotlib.pyplot as plt 
 
 path = ''
 
-def odeSystem(u, constants):
-    beta, alpha, = constants
-    S, I, R, = u
-    
-    N = S + I + R 
+dt = 0.01
+tfinal = 50
+times = np.arange(0,tfinal+dt,dt)
 
-    dSdt = -beta*S*I 
-    dIdt = beta*S*I - alpha*I 
-    dRdt = alpha*I 
+S0 = 90082.0
+I0 = 203
+R0 = 0.0
 
-    return np.array([dSdt,dIdt,dRdt])
-    
+def odeSystem(t, u, beta, alpha):
+
+    S, I, R = u
+    dS_dt = - beta*S*I 
+    dI_dt = beta*S*I - alpha*I
+    dR_dt = alpha*I
+
+    return [dS_dt, dI_dt, dR_dt]  
 
 def isReferenceTime(times, ct):
     for t in times: 
@@ -27,16 +32,12 @@ def isReferenceTime(times, ct):
 
 def solve(x):
     global data, reference_times
-    dt = 0.01
-    tfinal = 50
-    times = np.arange(0,tfinal+dt,dt)
 
-    N0 = x[0]
-    u = [N0]
+    u = [90082.0, 203, 0.0]
 
-    r = x[1]
-    k = x[2]
-    params = (r, k)
+    beta = x[0]
+    alpha = x[1]
+    params = (beta, alpha)
     
     def solveOde(t, y):
         return odeSystem(t, y, *params)
@@ -53,7 +54,6 @@ def solve(x):
             p_data = data["I"][i]
             error += (u[j] - p_data)*(u[j] - p_data) 
             sumobs += p_data*p_data
-            #sumobs = 1
             i = i + 1
         j = j + 1
 
@@ -63,22 +63,26 @@ def solve(x):
 if __name__ == "__main__":
     global data, reference_times 
     data = pd.read_csv(path+'I.csv', delimiter=',')
-    
     reference_times = data["Semana"]
-    print(reference_times)
+    dados_I = data["I"]
+    #plota os dados experimentais 
+    plt.scatter(reference_times, dados_I, marker='o', color='black', label='dados')
+    
     bounds = [
-        (0.001, 0.01),  #limites inferior e superior alpha
-        (0.01, 1.0)     #limites inferior e superior alpha
+        (0.00001, 0.01), (0.01, 0.90)
     ]
 
     #chama evolução diferencial, result contém o melhor individuo
-    solucao = differential_evolution(solve, bounds, strategy='rand2bin', maxiter=50, popsize=80,
-        atol=10**(-3), tol=10**(-3), mutation=0.8, recombination=0.5, disp=True, workers=4)
+    solucao = differential_evolution(solve, bounds, strategy='rand2bin', maxiter=50, popsize=40,atol=10**(-3), tol=10**(-3), mutation=0.8, recombination=0.5, disp=True, workers=4)
     
     print(solucao.x)
-    print(solucao.success)
     #saving the best offspring...
-    np.savetxt('solucao_ajuste.txt',solucao.x, fmt='%.2f')        
+    np.savetxt('solucao_ajuste.txt',solucao.x, fmt='%.6f')        
     best=solucao.x
     error = solve(best)
-    print("ERROR ", error)
+    #print("ERROR ", error)
+
+    u = [90082.0, 203, 0.0]
+    result_best = solve_ivp(odeSystem,(0, tfinal+dt), u, t_eval=times, args=best, method='RK45')
+    plt.plot(result_best.t, result_best.y[1,:], color='red', label='best individual')
+    plt.show()
