@@ -6,10 +6,10 @@ import math
 
 path = ''
 
-def odeSystem(u, constants):
+def odeSystem(t, alpha, beta):
     beta, alpha, = constants
     S, I, R, = u
-    
+
     N = S + I + R 
 
     dSdt = -beta*S*I 
