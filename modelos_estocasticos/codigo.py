@@ -21,7 +21,7 @@ for k in range(5):
 
     yresult = np.array(yresult)
 
-    plt.scatter(y = yresult, x = range(50))
-    plt.ylim([20, 50])
-    plt.savefig(f'teste_{k}.png')
-    plt.plot()
+plt.scatter(y = yresult, x = range(50))
+plt.ylim([20, 50])
+plt.savefig(f'modelos_estocasticos/teste.png')
+plt.plot(yresult)
