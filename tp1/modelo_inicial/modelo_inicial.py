@@ -61,7 +61,7 @@ def solveSystem(time, dt, y0, method):
     t = 0
     yk = [12, 3, 4]
     state = []
-    parameters = [0.05, 0.1, 0.1, 0., 0.03]
+    parameters = [0.05, 0.1, 0.1, 0.01, 0.03]
 
     if method == "euler":
         for t in tiime:
