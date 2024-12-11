@@ -82,7 +82,7 @@ def solveSystem(time, dt, y0, method):
     print(parameters)
 
     if method == "euler":
-        for t in tiime:
+        for t in time:
             state.append(yk)
             yk = euler(ode_system, t, yk, dt, constants=parameters)
 
@@ -96,7 +96,7 @@ def solveSystem(time, dt, y0, method):
 def save(time, state, names, filename):
     df = pd.DataFrame(state, columns = names)
     df.insert(0, 'time', time)
-    df.to_csv('results.csv', float_format='%.5f', sep=',')
+    df.to_csv(f'results{filename}.csv', float_format='%.5f', sep=',')
 
 def plot(time, state, names, filename):
     fig, ax = plt.subplots()
@@ -109,21 +109,25 @@ def plot(time, state, names, filename):
     #ax.plot(time2, sol, label='solucao analitica', linewidth='2')
     ax.set(xlabel='Dias', ylabel='Populacao')
     plt.legend(loc='best')
-    fig.savefig('modelo_inicial', format='png')
+    fig.savefig('modelo_inicial'+filename, format='png')
     plt.show()
+
+
+
 
 if __name__ == "__main__":
     names = ['TD', 'N', 'CH', 'A', 'M']
+    
     dt = 0.01
     tfinal = 50
     time = np.arange(0, tfinal + dt, dt)
     initial_condition = np.array([])
 
+    parameters = np.random.rand((12))       #[0.1 0.2 0.4 0.5]
+    nom_params = '_'.join(parameters)       #0.1_0.2_0.4_0.5
+
     result = solveSystem(time, dt, initial_condition, "rk4")
     
-    
-    parameters = np.random.rand((12))
-    nom_params = '_'.join(parameters)
 
     save(time, result, names, nom_params)
     plot(time, result, names, nom_params)

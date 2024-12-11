@@ -59,12 +59,14 @@ def euler(f, tk, _uk, _dt=0.001, **kwargs):
 
 def solveSystem(time, dt, y0, method):
     t = 0
-    yk = [12, 3, 4]
+    yk = [10, 0, 0]
     state = []
-    parameters = [0.05, 0.1, 0.1, 0.01, 0.03]
+    #parameters = [0.05, 0.1, 0.1, 0.01, 0.03]
+    parameters = np.random.rand((5))
+    print(parameters)
 
     if method == "euler":
-        for t in tiime:
+        for t in time:
             state.append(yk)
             yk = euler(ode_system, t, yk, dt, constants=parameters)
 

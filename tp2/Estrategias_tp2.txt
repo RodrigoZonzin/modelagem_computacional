@@ -1,0 +1,5 @@
+Estrategias: 
+	rand1bin;
+	rand2bin;
+	best1bin;
+	best2bin.
