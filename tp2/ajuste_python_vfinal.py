@@ -65,60 +65,56 @@ def solve(x):
 if __name__ == "__main__":
     global data, reference_times 
     
-    nome_estrategia = sys.argv[1]
-
-    beta_piso = float(sys.argv[2])
-    alpha_piso = float(sys.argv[3])
 
     data = pd.read_csv(path+'I.csv', delimiter=',')
     reference_times = data["Semana"]
     dados_I = data["I"]
 
 
-    for i in range(1, 4):
-        #plota os dados experimentais 
-        fig = plt.figure()
-        fig.set_size_inches(8, 6)
-        plt.scatter(reference_times, dados_I, marker='o', color='black', label='dados')
+    #plota os dados experimentais 
+    fig = plt.figure()
+    fig.set_size_inches(8, 6)
+    plt.scatter(reference_times, dados_I, marker='o', color='lightblue', label=r'I_{obs}')
 
-        bounds = [
-            (beta_piso*i, 0.01), (alpha_piso, 0.9)
-        ]
+    bounds = [
+        (0.00001, 0.02), (0, 0.85)
+    ]
 
-        #chama evolução diferencial, result contém o melhor individuo
-        solucao = differential_evolution(solve, bounds, strategy='rand2bin', maxiter=50, popsize=40,atol=10**(-3), tol=10**(-3), mutation=0.8, recombination=0.5, disp=True, workers=6)
+    #chama evolução diferencial, result contém o melhor individuo
+    estrategias = ['rand2bin', 'rand2bin', 'best1bin', 'best2bin']
+    for estr in estrategias:
+        solucao = differential_evolution(solve, bounds, strategy='rand2bin', maxiter=50, popsize=40,atol=10**(-3), tol=10**(-3), mutation=0.8, recombination=0.5, disp=True, workers=4)
 
         print(solucao.x)
         #saving the best offspring...
 
-        nome_pasta = f'results_{nome_estrategia}'+str(beta_piso*i).replace('.', '-')
-        os.mkdir(nome_pasta)
 
-        np.savetxt(f'{nome_pasta}solucao_ajuste.txt',solucao.x, fmt='%.6f')        
         best = solucao.x
         error = solve(best)
+        np.savetxt(f'solucao_ajuste.txt', solucao.x, fmt='%.8f')        
+        print(error)
         #print("ERROR ", error)
         #print(solucao.population)
         #print(solucao.population_energies)
 
         u = [S0, I0, R0]
         result_best = solve_ivp(odeSystem,(0, tfinal+dt), u, t_eval=times, args=best, method='RK45')
-        plt.plot(result_best.t, result_best.y[1,:], color='red', label='I')
+        plt.plot(result_best.t, result_best.y[1,:], color='red', label=r'I')
         plt.legend(loc='best')    
-        fig.savefig(f'{nome_pasta}I.png', format='png')
+        fig.savefig(f'I.png', format='png')
         #plt.show()    
         #
         fig = plt.figure()
         fig.set_size_inches(8, 6)
-        plt.plot(result_best.t, result_best.y[0,:], color='blue', label='S')
+        plt.plot(result_best.t, result_best.y[0,:], color='blue', label=r'S')
         plt.legend(loc='best')
-        fig.savefig(f'{nome_pasta}S.png', format='png')
+        fig.savefig(f'S.png', format='png')
         #plt.show()
         
         fig = plt.figure()
         fig.set_size_inches(8, 6)
-        plt.plot(result_best.t, result_best.y[2,:], color='green', label='R')
+        plt.plot(result_best.t, result_best.y[2,:], color='green', label=r'R')
         plt.legend(loc='best')
-        fig.savefig(f'{nome_pasta}R.png', format='png')
+        fig.savefig(f'R.png', format='png')
         #plt.show()
         
