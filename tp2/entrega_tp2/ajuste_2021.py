@@ -11,7 +11,7 @@ import os
 path = 'data/'
 
 dt = 0.01
-tfinal = 50
+tfinal = 100
 times = np.arange(0,tfinal+dt,dt)
 
 S0 = 90082.0
@@ -67,8 +67,8 @@ if __name__ == "__main__":
     global data, reference_times 
     
 
-    data = pd.read_csv(path+'I.csv', delimiter=',')
-    reference_times = data["Semana"]
+    data = pd.read_csv(path+'casos_2021.csv', delimiter=',')
+    reference_times = data["Ano_Semana"]
     dados_I = data["I"]
 
     cmap = cm.get_cmap('viridis', 4)
@@ -76,53 +76,41 @@ if __name__ == "__main__":
     #plota os dados experimentais 
     fig = plt.figure()
     fig.set_size_inches(8, 6)
-    plt.scatter(reference_times, dados_I, marker='o', color=cmap(0), label=r'I_{obs}')
+    plt.scatter(reference_times, dados_I, marker='o', color=cmap(0), label=r'$I_{obs}$')
 
     bounds = [
         (0.00001, 0.02), (0, 0.85)
     ]
 
     #chama evolução diferencial, result contém o melhor individuo
-    estrategias = ['rand2bin', 'rand2bin', 'best1bin', 'best2bin']
+    estrategias = ['rand1bin', 'rand2bin', 'best1bin', 'best2bin']
     for estr in estrategias:
-        solucao = differential_evolution(solve, bounds, strategy=estr, maxiter=50, popsize=40,atol=10**(-3), tol=10**(-3), mutation=0.8, recombination=0.5, disp=True, workers=4)
-
-        print(solucao.x)
-        #saving the best offspring...
-
+        solucao = differential_evolution(solve, bounds, strategy=estr, maxiter=50, popsize=40,atol=10**(-3), tol=10**(-3), mutation=0.8, recombination=0.5, disp=True, workers=3)
 
         best = solucao.x
         error = solve(best)
         np.savetxt(f'solucao_ajuste.txt', solucao.x, fmt='%.8f')        
+
+        print(estr)
+        print(solucao.x)
         print(error)
-        #print("ERROR ", error)
-        #print(solucao.population)
-        #print(solucao.population_energies)
+        print(10*"==")
 
         u = [S0, I0, R0]
         result_best = solve_ivp(odeSystem,(0, tfinal+dt), u, t_eval=times, args=best, method='RK45')
+        
+        #plota todas as curvas
         plt.plot(result_best.t, result_best.y[1,:], color= cmap(1), label=r'I')
-        #plt.legend(loc='best')    
-        #fig.savefig(f'I.png', format='png')
-        #plt.show()    
-        
-        #fig = plt.figure()
-        #fig.set_size_inches(8, 6)
         plt.plot(result_best.t, result_best.y[0,:], color=cmap(2), label=r'S')
-        #plt.legend(loc='best')
-        #fig.savefig(f'S.png', format='png')
-        #plt.show()
-        
-        #fig = plt.figure()
-        #fig.set_size_inches(8, 6)
         plt.plot(result_best.t, result_best.y[2,:], color=cmap(3), label=r'R')
+        
         plt.legend(loc='best')
         fig.savefig(f'results_{estr}.png', format='png')
-        #plt.show()
 
+        #figura apenas as curvas e dados
         fig1 = plt.figure()
         fig1.set_size_inches(8, 6)
-        plt.scatter(reference_times, dados_I, marker='o', color=cmap(0), label=r'$I_{obs}$')
+        plt.scatter(reference_times, dados_I, marker='o', color=cmap(0), label=r'I_{obs}')
         plt.plot(result_best.t, result_best.y[1,:], color= cmap(1), label=r'I')
         fig1.savefig(f'I_{estr}.png', format='png')
         

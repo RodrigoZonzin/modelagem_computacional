@@ -83,18 +83,21 @@ if __name__ == "__main__":
     ]
 
     #chama evolução diferencial, result contém o melhor individuo
-    estrategias = ['rand2bin', 'rand2bin', 'best1bin', 'best2bin']
+    estrategias = ['rand1bin', 'rand2bin', 'best1bin', 'best2bin']
     for estr in estrategias:
         solucao = differential_evolution(solve, bounds, strategy=estr, maxiter=50, popsize=40,atol=10**(-3), tol=10**(-3), mutation=0.8, recombination=0.5, disp=True, workers=4)
 
-        print(solucao.x)
+        
         #saving the best offspring...
 
 
         best = solucao.x
         error = solve(best)
         np.savetxt(f'solucao_ajuste.txt', solucao.x, fmt='%.8f')        
+        print(estr)
+        print(solucao.x)
         print(error)
+        print(10*"==")
         #print("ERROR ", error)
         #print(solucao.population)
         #print(solucao.population_energies)
@@ -122,7 +125,7 @@ if __name__ == "__main__":
 
         fig1 = plt.figure()
         fig1.set_size_inches(8, 6)
-        plt.scatter(reference_times, dados_I, marker='o', color=cmap(0), label=r'$I_{obs}$')
+        plt.scatter(reference_times, dados_I, marker='o', color=cmap(0), label=r'I_{obs}')
         plt.plot(result_best.t, result_best.y[1,:], color= cmap(1), label=r'I')
         fig1.savefig(f'I_{estr}.png', format='png')
         

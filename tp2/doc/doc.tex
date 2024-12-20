@@ -1,20 +1,188 @@
 \documentclass[]{article}
-\usepackage[top=2cm, right=2cm, left=3cm, bottom=3cm]{geometry}
 \usepackage[portuguese]{babel}
+\usepackage[letterpaper,top=2cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}
+\usepackage{esdiff}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{subfigure}
+\usepackage{booktabs}
+\usepackage{subfigure}
+\usepackage{xfrac}
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+
+
 %opening
-\title{Estimando parâmetros do modelo SIR para o caso de São João del-Rei, MG, em 2021}
+\title{Relatório: Estimando parâmetros do modelo SIR para o caso de São João del-Rei, MG, em 2021}
 \author{Rodrigo José Zonzin Esteves}
-\date{Novembro de 2024}
+\date{Dezembro de 2024}
 
 \begin{document}
 
 \maketitle
 
-\section{Introdução}
-\section{Dados e Métodos}
+\section{O Modelo SIR e estratégias adotadas}
+O modelo Suscetível-Infectado-Recuperado (SIR) é dado pelo sistema de EDO's apresentado pela Equação \ref{eq01}. Os parâmetros $\alpha$ e $\beta$ podem ser estimados através de um processo de ajuste de curvas não-lineares. 
+
+\begin{equation}	
+	\begin{cases}
+		
+		\diff{S(t)}{t} = -\beta S(t) I(t) \\
+		\diff{I(t)}{t} = \beta S(t)  I(t) - \alpha I(t) \\
+		\diff{R(t)}{t} = \alpha I(t)
+	\end{cases}	
+	\label{eq01}
+\end{equation}
+
+Para o ajuste de curvas, considerou-se a Norma 2 $||\cdot||_2$ como medida de erro. 
+\begin{equation}
+	||erro|| = \sqrt{\sum_{i = 1}^{n} (y_i - \hat{y}_i)^2}
+\end{equation}
+
+Os dados para o ajuste consistem em uma série temporal  com o número de infectados acumulado diariamente em São João del-Rei. Esse dado é representado pelo vetor $\mathbf{I}$. 
+
+Portanto, para que se estime $\alpha$ e $\beta$, é preciso minimizar a função-objetivo dada pela Equação \ref{eq03}. 
+
+\begin{equation}
+	\begin{aligned}
+		&\textbf{min} \quad \text{erro}(\alpha, \beta) = \sqrt{\frac{\sum_{i \in \mathbf{I}} (\hat{i} - i)^2}{\sum_{i \in \mathbf{I}} i^2}} \\
+		&\alpha, \beta \in [0, 1]
+	\end{aligned}
+	\label{eq03}
+\end{equation}
+
+
+A otimização da Equação \ref{eq03} foi obtida através do método de Evolução Diferencial. Considerou-se ainda, para cada ajuste, as seguintes estratégias de mutação e cruzamento: 
+\begin{enumerate}
+	\item rand1bin
+	\item rand2bin
+	\item best1bin
+	\item best2bin
+\end{enumerate}
+
 \section{Resultados}
 \subsection{Primeiras doze semanas de 2021}
 
+\begin{table}[h!]
+	\centering
+	\begin{tabular}{l c | c c}
+		\toprule
+		Estrategia & Erro Associado & $\alpha$ & $\beta$ \\
+		\hline
+		rand1bin & 0.16339400  & 0.00001169 & 0.83307879 \\
+		rand2bin & 0.16156398  & 0.00001189 & 0.84978616 \\
+		best1bin & 0.21111678  & 0.00001204	& 0.84661256 \\		
+		best2bin & 11.61501726 & 0.02000000 & 0.85000000 \\
+		\bottomrule
+		
+	\end{tabular}
+\end{table}
+
+\begin{figure}[h!]
+	\centering
+	
+	\subfigure[Curva I]{\includegraphics[width=0.45\linewidth]{figs/I_rand1bin.png}}
+	\subfigure[Todas as Curvas]{\includegraphics[width=0.45\linewidth]{figs/results_rand1bin.png}}
+	
+	\caption{Resultados para rand1bin}
+	\label{res01}
+\end{figure}
+
+\begin{figure}[h!]
+	\centering
+	
+	\subfigure[Curva I]{\includegraphics[width=0.45\linewidth]{figs/I_rand2bin.png}}
+	\subfigure[Todas as Curvas]{\includegraphics[width=0.45\linewidth]{figs/results_rand2bin.png}}
+		
+	\caption{Resultados para rand2bin}
+	\label{res02}
+\end{figure}
+
+\begin{figure}[h!]
+	\centering
+	
+	\subfigure[Curva I]{\includegraphics[width=0.45\linewidth]{figs/I_best1bin.png}}
+	\subfigure[Todas as Curvas]{\includegraphics[width=0.45\linewidth]{figs/results_best1bin.png}}
+	
+	\caption{Resultados para best1bin}
+	\label{res03}
+\end{figure}
+
+\begin{figure}[h!]
+	\centering
+	
+	\subfigure[Curva I]{\includegraphics[width=0.45\linewidth]{figs/I_best2bin.png}}
+	\subfigure[Todas as Curvas]{\includegraphics[width=0.45\linewidth]{figs/results_best2bin.png}}
+	
+	\caption{Resultados para best2bin}
+	\label{res04}
+\end{figure}
+
+
+
+\newpage
+
 \subsection{Ano de 2021}
+
+\begin{table}[h!]
+	\centering
+	\begin{tabular}{l c | c c}
+		\toprule
+		Estrategia & Erro Associado & $\alpha$ & $\beta$ \\
+		\hline
+		rand1bin & 1.43433162 & 0.02000000 & 0.85000000 \\
+		rand2bin & 1.43433162 & 0.02000000 & 0.85000000 \\
+		best1bin & 0.89975065 & 0.00001000 & 0.69827012 \\		
+		best2bin & 0.89975065 & 0.00001000 & 0.69827012 \\		
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\begin{figure}[h!]
+	\centering
+	
+	\subfigure[Curva I]{\includegraphics[width=0.45\linewidth]{figs_2021/I_rand1bin.png}}
+	\subfigure[Todas as Curvas]{\includegraphics[width=0.45\linewidth]{figs_2021/results_rand1bin.png}}
+	
+	\caption{Resultados para rand1bin}
+	\label{res05}
+\end{figure}
+
+\begin{figure}[h!]
+	\centering
+	
+	\subfigure[Curva I]{\includegraphics[width=0.45\linewidth]{figs_2021/I_rand2bin.png}}
+	\subfigure[Todas as Curvas]{\includegraphics[width=0.45\linewidth]{figs_2021/results_rand2bin.png}}
+	
+	\caption{Resultados para rand2bin}
+	\label{res06}
+\end{figure}
+
+\begin{figure}[h!]
+	\centering
+	
+	\subfigure[Curva I]{\includegraphics[width=0.45\linewidth]{figs_2021/I_best1bin.png}}
+	\subfigure[Todas as Curvas]{\includegraphics[width=0.45\linewidth]{figs_2021/results_best1bin.png}}
+	
+	\caption{Resultados para best1bin}
+	\label{res07}
+\end{figure}
+
+\begin{figure}[h!]
+	\centering
+	
+	\subfigure[Curva I]{\includegraphics[width=0.45\linewidth]{figs_2021/I_best2bin.png}}
+	\subfigure[Todas as Curvas]{\includegraphics[width=0.45\linewidth]{figs_2021/results_best2bin.png}}
+	
+	\caption{Resultados para best2bin}
+	\label{res08}
+\end{figure}
+
+\section{Conclusão}
+Conforme \cite{Barcelos2011}, ``A estratégia a ser adotada para um problema é determinada por tentativa e erro". Para o caso em tela, observou-se que a estratégia que apresentou o menor erro é foi a rand2bin. 
+
+Para o ano de 2021, observa-se uma subestimação do número de infectados em relação ao dado observado. Isso ocorre pois o modelo SIR não considera a inclusão de recuperados no grupo de Suscetíveis. De fato, já se sabe que a reinfecção por Covid-19  é um fato importante no comportamento epidemiológico da doença \cite{Silva2021}, não sendo mapeado pelo modelo em estudo. 
+
+\bibliographystyle{plain} 
+\bibliography{referencias.bib} 
 
 \end{document}
