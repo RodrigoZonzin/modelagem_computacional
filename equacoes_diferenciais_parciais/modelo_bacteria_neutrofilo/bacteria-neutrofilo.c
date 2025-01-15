@@ -25,7 +25,7 @@ float r = 0.2,
     v_n = 0.; 
 
 //(-1, 0) faz plotar em todos os pontos do dominio
-float source_points[2] = {-1, 0.0};
+float source_points[4] = {10.0, 15.0, 30.0, 32.0};
 
 enum CellType {
     B,
