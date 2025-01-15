@@ -4,7 +4,9 @@ from scipy.integrate import  solve_ivp
 from scipy.optimize import differential_evolution
 import math
 import matplotlib.pyplot as plt 
+import matplotlib.cm as cm
 import sys
+import os
 
 path = 'data/'
 
@@ -65,52 +67,62 @@ if __name__ == "__main__":
     global data, reference_times 
     
 
-    nome_estrategia = sys.argv[1]
-    beta_piso = sys.argv[2]
-    alpha_piso = sys.argv[3]
-
     data = pd.read_csv(path+'I.csv', delimiter=',')
     reference_times = data["Semana"]
     dados_I = data["I"]
 
+    cmap = cm.get_cmap('viridis', 4)
+
     #plota os dados experimentais 
     fig = plt.figure()
     fig.set_size_inches(8, 6)
-    plt.scatter(reference_times, dados_I, marker='o', color='black', label='dados')
-    
+    plt.scatter(reference_times, dados_I, marker='o', color=cmap(0), label=r'I_{obs}')
+
     bounds = [
-        (beta_piso, 0.01), (alpha_piso, 0.9)
+        (0.00001, 0.02), (0, 0.85)
     ]
 
     #chama evolução diferencial, result contém o melhor individuo
-    solucao = differential_evolution(solve, bounds, strategy='rand2bin', maxiter=50, popsize=40,atol=10**(-3), tol=10**(-3), mutation=0.8, recombination=0.5, disp=True, workers=6)
-    
-    print(solucao.x)
-    #saving the best offspring...
-    np.savetxt(f'solucao_ajuste.txt',solucao.x, fmt='%.6f')        
-    best = solucao.x
-    error = solve(best)
-    #print("ERROR ", error)
-    print(solucao.population)
-    print(solucao.population_energies)
-    
-    u = [S0, I0, R0]
-    result_best = solve_ivp(odeSystem,(0, tfinal+dt), u, t_eval=times, args=best, method='RK45')
-    plt.plot(result_best.t, result_best.y[1,:], color='red', label='I')
-    plt.legend(loc='best')    
-    fig.savefig(f'I_{nome_estrategia}.png', format='png')
-    plt.show()    
+    estrategias = ['rand2bin', 'rand2bin', 'best1bin', 'best2bin']
+    for estr in estrategias:
+        solucao = differential_evolution(solve, bounds, strategy=estr, maxiter=50, popsize=40,atol=10**(-3), tol=10**(-3), mutation=0.8, recombination=0.5, disp=True, workers=4)
 
-    fig = plt.figure()
-    fig.set_size_inches(8, 6)
-    plt.plot(result_best.t, result_best.y[0,:], color='blue', label='S')
-    plt.legend(loc='best')
-    fig.savefig(f'S_{nome_estrategia}.png', format='png')
-    plt.show()
-    
-    fig = plt.figure()
-    fig.set_size_inches(8, 6)
-    plt.plot(result_best.t, result_best.y[2,:], color='green', label='R')
-    plt.legend(loc='best')
-    fig.savefig(f'R.png', format='png')
-    plt.show()
+        print(solucao.x)
+        #saving the best offspring...
+
+
+        best = solucao.x
+        error = solve(best)
+        np.savetxt(f'solucao_ajuste.txt', solucao.x, fmt='%.8f')        
+        print(error)
+        #print("ERROR ", error)
+        #print(solucao.population)
+        #print(solucao.population_energies)
+
+        u = [S0, I0, R0]
+        result_best = solve_ivp(odeSystem,(0, tfinal+dt), u, t_eval=times, args=best, method='RK45')
+        plt.plot(result_best.t, result_best.y[1,:], color= cmap(1), label=r'I')
+        #plt.legend(loc='best')    
+        #fig.savefig(f'I.png', format='png')
+        #plt.show()    
+        
+        #fig = plt.figure()
+        #fig.set_size_inches(8, 6)
+        plt.plot(result_best.t, result_best.y[0,:], color=cmap(2), label=r'S')
+        #plt.legend(loc='best')
+        #fig.savefig(f'S.png', format='png')
+        #plt.show()
+        
+        #fig = plt.figure()
+        #fig.set_size_inches(8, 6)
+        plt.plot(result_best.t, result_best.y[2,:], color=cmap(3), label=r'R')
+        plt.legend(loc='best')
+        fig.savefig(f'results_{estr}.png', format='png')
+        #plt.show()
+
+        fig1 = plt.figure()
+        fig1.set_size_inches(8, 6)
+        plt.scatter(reference_times, dados_I, marker='o', color=cmap(0), label=r'$I_{obs}$')
+        plt.plot(result_best.t, result_best.y[1,:], color= cmap(1), label=r'I')
+        fig1.savefig(f'I_{estr}.png', format='png')
+        
