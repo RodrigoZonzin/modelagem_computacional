@@ -1,5 +1,6 @@
 try:
     from ca import *
+    from random import * 
 
 except ModuleNotFoundError:
     from sys import path
@@ -9,7 +10,7 @@ except ModuleNotFoundError:
 
 
 class ForestProp(CA):
-    global QUEIMADO, QUEIMANDO, VAZIO, FLORESTA
+    global QUEIMADO, QUEIMANDO, VAZIO, FLORESTA, pF
     def rule(self, x, y):
         #estado atual
         s = self[x, y]
@@ -19,7 +20,7 @@ class ForestProp(CA):
         
         #Estado queimado ou vazio: nao muda de estado.
         if s == VAZIO or s == QUEIMADO: 
-            pass
+            return s
 
         #Estado floresta: pode mudar para o estado queimando com probabilidade pf 
         #e se tiver pelo menos um vizinho queimando;
@@ -27,11 +28,13 @@ class ForestProp(CA):
             p = random()
 
             if p < pF and QUEIMANDO in n: 
-                s == QUEIMANDO
+                return QUEIMANDO
+            
+            return s
         
         #Estado queimando: muda para o estado queimado ap´os um passo de tempo
         if s == QUEIMANDO: 
-            s = QUEIMADO
+            return QUEIMADO
 
 
 
@@ -39,24 +42,27 @@ VAZIO       = 0
 FLORESTA    = 1
 QUEIMANDO   = 2
 QUEIMADO    = 3
-pF          = 0.75
-d           = 300                    #dimensao do dominio
 
-nVazio      = int((1-pF)*d - 1)     #numero de celulas vazias = (1 - P[ser floresta])*d
-nFloresta   = int(pF*d)
+N           = 50
+pF          = 0.99   
+d           = int(pF*N**2) 
+                
 
+Ac = ForestProp(N, values = 4, random_values=False)
 
-Ac = ForestProp(20, [VAZIO] + [FLORESTA]*0 + [QUEIMANDO]*0 + [QUEIMADO]*0)
+for i in range(d):
+    Ac.add(FLORESTA, points=[(randint(0, N), randint(0, N))], size = (1,1))
 
-i = 0 
-while i < d: 
-    
-    Ac.addrandomvalues(VAZIO, FLORESTA, 300)
-    i += 1
+for i in range(1):
+    Ac.add(VAZIO, points=[(randint(0, N), randint(0, N))], size = (1,1))
 
+#for i in range(2): 
+Ac.add(QUEIMANDO, points=[(0,0)], size = (1,1))
+Ac.add(QUEIMANDO, points=[(0,1)], size = (1,1))
 
-#plot(Ac, N=20, out="meuca.pdf")
-plot(Ac, N=50, out='forestProp.pdf', graphic = True, vmax = 3,
-    colors=['white', 'green', 'orange', 'black'],
-    names=['VAZIO', 'FLORESTA', 'QUEIMANDO', 'QUEIMADO']
-)
+for i in range(5): 
+    Ac.add(QUEIMADO, points=[(randint(0, N), randint(0, N))], size = (1,1))
+
+plot(Ac, N=50, out='forestProp.pdf', graphic = True, vmax = 3, 
+    colors = ['white', 'darkgreen', 'orange', 'black'],
+    names = ['Vazio', 'Floresta', 'Queimando', 'Queimado'])
