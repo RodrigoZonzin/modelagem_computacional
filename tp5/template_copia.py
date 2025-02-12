@@ -10,9 +10,8 @@ except ModuleNotFoundError:
 
 
 class ForestProp(CA):
+    global QUEIMADO, QUEIMANDO, VAZIO, FLORESTA, pF
     def rule(self, x, y):
-        global QUEIMADO, QUEIMANDO, VAZIO, FLORESTA, pF
-
         #estado atual
         s = self[x, y]
 
@@ -45,21 +44,24 @@ QUEIMANDO   = 2
 QUEIMADO    = 3
 
 N           = 50
-pF          = 0.45    
-pFloresta   = 0.99
-d           = int(pFloresta*N**2) 
+pF          = 0.99   
+d           = int(pF*N**2) 
                 
 
 Ac = ForestProp(N, values = 4, random_values=False)
 
-for i in range(d+200):
+for i in range(d):
     Ac.add(FLORESTA, points=[(randint(0, N), randint(0, N))], size = (1,1))
 
+for i in range(1):
+    Ac.add(VAZIO, points=[(randint(0, N), randint(0, N))], size = (1,1))
 
-xy_meio = int(N/2)
-print(xy_meio)
-Ac.add(QUEIMANDO, points=[(xy_meio, xy_meio)], size= (1,1))
+#for i in range(2): 
+Ac.add(QUEIMANDO, points=[(0,0)], size = (1,1))
+Ac.add(QUEIMANDO, points=[(0,1)], size = (1,1))
 
+for i in range(5): 
+    Ac.add(QUEIMADO, points=[(randint(0, N), randint(0, N))], size = (1,1))
 
 plot(Ac, N=50, out='forestProp.pdf', graphic = True, vmax = 3, 
     colors = ['white', 'darkgreen', 'orange', 'black'],
