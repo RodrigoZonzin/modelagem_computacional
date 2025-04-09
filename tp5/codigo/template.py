@@ -44,7 +44,7 @@ FLORESTA    = 1
 QUEIMANDO   = 2
 QUEIMADO    = 3
 
-N           = 50
+N           = 2
 pF          = 0.45    
 pFloresta   = 0.99
 d           = int(pFloresta*N**2) 
@@ -52,13 +52,16 @@ d           = int(pFloresta*N**2)
 
 Ac = ForestProp(N, values = 4, random_values=False)
 
-for i in range(d+200):
-    Ac.add(FLORESTA, points=[(randint(0, N), randint(0, N))], size = (1,1))
+#for i in range(d+200):
+#    Ac.add(FLORESTA, points=[(randint(0, N), randint(0, N))], size = (1,1))
 
-
-xy_meio = int(N/2)
-print(xy_meio)
-Ac.add(QUEIMANDO, points=[(xy_meio, xy_meio)], size= (1,1))
+Ac.add(0, points = [(0, 0)], size = (1, 1))
+Ac.add(1, points = [(0, 1)], size = (1, 1))
+Ac.add(2, points = [(1, 0)], size = (1, 1))
+Ac.add(0, points = [(1, 1)], size = (1, 1))
+#xy_meio = int(N/2)
+#print(xy_meio)
+#Ac.add(QUEIMANDO, points=[(xy_meio, xy_meio)], size= (1,1))
 
 
 plot(Ac, N=50, out='forestProp.pdf', graphic = True, vmax = 3, 
