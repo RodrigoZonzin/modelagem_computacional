@@ -7,6 +7,7 @@ Figure shows the diagram for modeling how the tecidual damage behaves in a skin 
 ![](tp1/modelo1.png)
 
 We can derive Equations as follows: 
+
 $$\frac{d}{dt}TD(t) = \alpha N(t)$$
 $$\frac{d}{dt} N(t)= \beta TD(t) + \gamma CH(t) -\alpha N(t)$$
 $$\frac{d}{dt} CH(t) = \rho N(t) - \sigma CH(t)$$
