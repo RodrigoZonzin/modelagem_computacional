@@ -27,5 +27,8 @@ $$\frac{d}{dt}M(t) = v N(t) -\eta_M M(t)$$
 $$\frac{d}{dt}A(t) = w_{reg} M(t) -\eta_A A(t)$$
 
 The results show that all variables grow indefinitely. Particularly, the tissue damage $TD(t), pro-inflammatory cytokines $CH(t)$ and neutrophils $N(t)$ follow an uncontrolled exponential pattern. This suggests that without anti-inflammatory action, the inflammatory process becomes self-reinforcing and unbounded.
-*Conclusion:* The wound never heals without immune response. 
+**Conclusion:** The wound never heals without immune response. 
 
+
+With the inclusion of regulatory terms $M(t)$ and $A(t)$, the simulations display a range of behaviors. In some configurations, both neutrophils and cytokines decay to zero, showing a resolution of inflammation.
+**Conclusion:** The immune system, when effectively modeled, is able to suppress and eventually eliminate inflammation.
